@@ -79,7 +79,7 @@ function createWindow () {
   mainWindow.loadURL(`file://${__dirname}/app/index.html`);
 
   // Open the DevTools for debugging.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   // get the name of the song which is currently playing
   mainWindow.on('focus', getSpotifySong);

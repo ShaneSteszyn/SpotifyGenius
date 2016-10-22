@@ -12,21 +12,7 @@
   </head>
   <body>
     <script>
-    const TitlebarWindows = require('electron-titlebar-windows');
-    const titlebar = new TitlebarWindows({ draggable:true});
-    titlebar.appendTo(document.body);
-
-    titlebar.on('close', function(e) {
-      window.close();
-    });
-
-    titlebar.on('minimize', function(e) {
-      ipcRenderer.send('minimize');
-    });
-
-    titlebar.on('maximize', function(e) {
-      ipcRenderer.send('maximize');
-    });
+    const titlebar = require('electron-titlebar');
 
       const {ipcRenderer} = require('electron');
       ipcRenderer.on('lyrics', function(event, song){
@@ -42,7 +28,10 @@
       }
     </script>
     <!-- All of the Node.js APIs are available in this renderer process. -->
-    <div id="electron-titlebar" class="drag"></div>
+    <div id="electron-titlebar" class="drag" style="background-color: #282828; color:white">
+      <div style="width: 100%; height: 100%; text-align: center; line-height: 40px; ">SpotifyGenius</div>
+    </div>
+
 
     <div id="topBar">
       <button onclick="sendReloadSong()" class="ui button">
