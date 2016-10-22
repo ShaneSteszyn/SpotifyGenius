@@ -1,4 +1,4 @@
-"use strict";
+// "use strict";
 //ELECTRON STUFF
 const electron = require('electron');
 // Module to control application life.
@@ -93,7 +93,6 @@ function getSong(id){
 	geniusClient.getSong(id, function (error, song) {
 		song = JSON.parse(song);
 		
-
 		console.log(JSON.stringify(song, undefined, 2));
 	});
 }
@@ -104,16 +103,9 @@ function getLyrics(lyricsUrl){
 			let $ = cheerio.load(html);
 			var lyrics = $(".lyrics").html();
 			console.log(lyrics);
+			mainWindow.webContents.send('lyrics', lyrics);
 		}
 	});
-	// jsdom.env(lyricsUrl,["http://code.jquery.com/jquery.js"],function (err, window) {
-
-	// 	if (!err){
-	// 		var lyrics = window.$(".lyrics").html();
-	// 		console.log(lyrics);
-	// 	}
-	// 	// console.log("there have been", window.$("a").length - 4, "io.js releases!");
-	// });
 }
 
 // This method will be called when Electron has finished

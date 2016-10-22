@@ -3,13 +3,24 @@
   <head>
     <meta charset="UTF-8">
     <title>Hello World!</title>
+
+    
   </head>
   <body>
+    <script>
+      require('electron').ipcRenderer.on('lyrics', function(event, lyrics){
+        console.log(lyrics);
+        document.getElementById("lyrics").innerHTML = lyrics;
+      });
+    </script>
     <h1>Hello World!</h1>
     <!-- All of the Node.js APIs are available in this renderer process. -->
     We are using node <script>document.write(process.versions.node)</script>,
     Chromium <script>document.write(process.versions.chrome)</script>,
     and Electron <script>document.write(process.versions.electron)</script>.
+
+    <div id="lyrics">
+    </div>
   </body>
 
   <script>
