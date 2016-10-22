@@ -1,0 +1,19 @@
+{
+  "name": "spotifylyrics",
+  "version": "1.0.0",
+  "description": "Grabs current song info from Spotify window and gets Genius lyrics",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Shane Steszyn",
+  "license": "ISC",
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "jquery": "^3.1.1",
+    "jsdom": "^9.8.0",
+    "node-genius": "^1.1.0",
+    "node-spotify-webhelper": "0.0.5",
+    "request": "^2.75.0"
+  }
+}
