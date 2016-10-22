@@ -1,10 +1,12 @@
 // "use strict";
 //ELECTRON STUFF
 const electron = require('electron');
+const ipcMain = electron.ipcMain;
 // Module to control application life.
 const app = electron.app;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
+
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -23,42 +25,64 @@ var geniusClient = new Genius("uG43dODDI_4MMivGiU1wWnW0Xl5hqZxR4ZA_ET0adiTdO0kP8
 var currentSong = {id: null, originalTitle: null, title: null, artistName: null, artistId: null, lyrics:null, url: null};
 
 
+ipcMain.on('reloadSong', (event, arg) => {
+  getSpotifySong();
+});
+
+ipcMain.on('minimize', (event, arg) => {
+  mainWindow.minimize();
+});
+
+ipcMain.on('maximize', (event, arg) => {
+	if (mainWindow.isMaximized()){
+		mainWindow.unmaximize();
+	}
+	else{
+		mainWindow.maximize();
+	}
+});
+
+function getSpotifySong(){
+	spotify.getStatus(function (err, res) {
+
+	  if (err) {
+			return console.error(err);
+	  }
+
+	  if (res.open_graph_state.private_session){
+			return "NOT PUBLIC LISTENING";
+		}  
+
+		console.log(res);
+		if(currentSong.originalTitle !== res.track.track_resource.name){
+	  	//Log info of song currently playing
+
+		  console.info('currently playing:',
+			res.track.artist_resource.name, '-',
+			res.track.track_resource.name);
+
+		  currentSong.originalTitle = res.track.track_resource.name;
+		  var query = res.track.artist_resource.name+'-'+res.track.track_resource.name;
+
+		  search(query);
+
+		  console.log(query);
+		}
+	});
+}
+
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600});
+  mainWindow = new BrowserWindow({width: 600, height: 800, frame:false, resizable:true });
 
   // and load the index.html of the app.
-  mainWindow.loadURL(`file://${__dirname}/index.html`);
+  mainWindow.loadURL(`file://${__dirname}/app/index.html`);
 
   // Open the DevTools for debugging.
   // mainWindow.webContents.openDevTools();
 
   // get the name of the song which is currently playing
   mainWindow.on('focus', getSpotifySong);
-
-  function getSpotifySong(){
-  	spotify.getStatus(function (err, res) {
-		  if (err) {
-			return console.error(err);
-		  }
-
-		  if (res.open_graph_state.private_Session){
-			return "NOT PUBLIC LISTENING";
-		  
-		}  
-		if(currentSong.originalTitle !== res.track.track_resource.name)
-		  //Log info of song currently playing
-		  console.info('currently playing:',
-			res.track.artist_resource.name, '-',
-			res.track.track_resource.name);
-
-		  var query = res.track.artist_resource.name+'-'+res.track.track_resource.name;
-
-		  search(query);
-
-		  console.log(query);
-		});
-  }
 	
 
 
@@ -92,15 +116,14 @@ function search(searchQuery){
 			currentSong.artistId = song.primary_artist.id;
 			currentSong.url = song.url;
 
-
 			getLyrics(currentSong);
 		}
 		else{
 			currentSong.title = "No match!!!";
-			currentSong.id = "No match!!!"
-			currentSong.artistName = "No match!!!"
-			currentSong.artistId = "No match!!!"
-			currentSong.url = "No match!!!"
+			currentSong.id = "No match!!!";
+			currentSong.artistName = "No match!!!";
+			currentSong.artistId = "No match!!!";
+			currentSong.url = "No match!!!";
 
 			mainWindow.webContents.send('lyrics', JSON.stringify(currentSong));
 		}
@@ -121,7 +144,18 @@ function getLyrics(song){
 	request(song.url, function (error, response, html) {
 		if (!error && response.statusCode == 200) {
 			let $ = cheerio.load(html);
-			currentSong.lyrics = $(".lyrics").html();
+			$("a").addClass("paragraph");
+
+			var lyrics =  $(".lyrics");
+			$ =  cheerio.load(lyrics.html());
+
+			//Get rid of all links, we dont need this.
+			$("a").each(function(i, elem) {
+				console.log($(this).html());
+				$(this).replaceWith($('<p>' + $(this).html() + '</p>'));
+			});
+
+			currentSong.lyrics = $.html();
 
       mainWindow.webContents.send('lyrics', JSON.stringify(currentSong));
 		}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>SpotifyGenius v0.01!</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+    <script src="semantic/dist/semantic.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    
+  </head>
+  <body>
+    <script>
+    const TitlebarWindows = require('electron-titlebar-windows');
+    const titlebar = new TitlebarWindows({ draggable:true});
+    titlebar.appendTo(document.body);
+
+    titlebar.on('close', function(e) {
+      window.close();
+    });
+
+    titlebar.on('minimize', function(e) {
+      ipcRenderer.send('minimize');
+    });
+
+    titlebar.on('maximize', function(e) {
+      ipcRenderer.send('maximize');
+    });
+
+      const {ipcRenderer} = require('electron');
+      ipcRenderer.on('lyrics', function(event, song){
+        song = JSON.parse(song);
+        console.log(song);
+        document.getElementById("title").innerHTML = song.title;
+        document.getElementById("artist").innerHTML = song.artistName;
+        document.getElementById("lyrics").innerHTML = song.lyrics;
+      });
+
+      function sendReloadSong(){
+        ipcRenderer.send('reloadSong');
+      }
+    </script>
+    <!-- All of the Node.js APIs are available in this renderer process. -->
+    <div id="electron-titlebar" class="drag"></div>
+
+    <div id="topBar">
+      <button onclick="sendReloadSong()" class="ui button">
+        Reload
+      </button>
+    </div>
+    <div id="content">
+      
+      <h2 align="center" id="artist"></h2>
+      <h2 align="center" id="title"></h2>
+      <div id="lyrics">
+      </div>
+    </div>
+
+    <br>
+
+      Using node <script>document.write(process.versions.node)</script>,
+      Chromium <script>document.write(process.versions.chrome)</script>,
+      and Electron <script>document.write(process.versions.electron)</script>
+      <p>Application built by Shane Steszyn (2016)</p>
+
+  </body>
+
+  <script>
+    // You can also require other files to run in this process
+    require('./renderer.js')
+  </script>
+</html>
