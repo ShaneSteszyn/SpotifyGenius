@@ -20,7 +20,7 @@ let cheerio = require('cheerio');
 var Genius = require("node-genius");
 var geniusClient = new Genius("uG43dODDI_4MMivGiU1wWnW0Xl5hqZxR4ZA_ET0adiTdO0kP8_UMUPuDiBAnJpEo");
 
-var currentSong = {id: null, title: null, artistName: null, artistId: null, lyrics:null, url: null};
+var currentSong = {id: null, originalTitle: null, title: null, artistName: null, artistId: null, lyrics:null, url: null};
 
 
 function createWindow () {
@@ -31,29 +31,35 @@ function createWindow () {
   mainWindow.loadURL(`file://${__dirname}/index.html`);
 
   // Open the DevTools for debugging.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
   // get the name of the song which is currently playing
-	spotify.getStatus(function (err, res) {
-	  if (err) {
-		return console.error(err);
-	  }
+  mainWindow.on('focus', getSpotifySong);
 
-	  if (res.open_graph_state.private_Session){
-		return "NOT PUBLIC LISTENING";
-	  
-	}  
-	  //Log info of song currently playing
-	  console.info('currently playing:',
-		res.track.artist_resource.name, '-',
-		res.track.track_resource.name);
+  function getSpotifySong(){
+  	spotify.getStatus(function (err, res) {
+		  if (err) {
+			return console.error(err);
+		  }
 
-	  var query = res.track.artist_resource.name+'-'+res.track.track_resource.name;
+		  if (res.open_graph_state.private_Session){
+			return "NOT PUBLIC LISTENING";
+		  
+		}  
+		if(currentSong.originalTitle !== res.track.track_resource.name)
+		  //Log info of song currently playing
+		  console.info('currently playing:',
+			res.track.artist_resource.name, '-',
+			res.track.track_resource.name);
 
-	  search(query);
+		  var query = res.track.artist_resource.name+'-'+res.track.track_resource.name;
 
-	  console.log(query);
-	});
+		  search(query);
+
+		  console.log(query);
+		});
+  }
+	
 
 
   // Emitted when the window is closed.
@@ -72,20 +78,32 @@ function search(searchQuery){
 		}
 		
 		results = JSON.parse(results);
-		var trackList = results.response.hits;
+		
 
-		console.log(JSON.stringify(results, undefined, 2));
+		if (results.response.hits && results.response.hits.length > 0){
+			var trackList = results.response.hits;
+			console.log(JSON.stringify(results, undefined, 2));
 
-		var song = trackList[0].result;
+			var song = trackList[0].result;
 
-		currentSong.title = song.title;
-		currentSong.id = song.id;
-		currentSong.artistName = song.primary_artist.name;
-		currentSong.artistId = song.primary_artist.id;
-		currentSong.url = song.url;
+			currentSong.title = song.title;
+			currentSong.id = song.id;
+			currentSong.artistName = song.primary_artist.name;
+			currentSong.artistId = song.primary_artist.id;
+			currentSong.url = song.url;
 
 
-		getLyrics(currentSong);
+			getLyrics(currentSong);
+		}
+		else{
+			currentSong.title = "No match!!!";
+			currentSong.id = "No match!!!"
+			currentSong.artistName = "No match!!!"
+			currentSong.artistId = "No match!!!"
+			currentSong.url = "No match!!!"
+
+			mainWindow.webContents.send('lyrics', JSON.stringify(currentSong));
+		}
 	});
 }
 

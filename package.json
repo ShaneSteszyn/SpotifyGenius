@@ -1,5 +1,5 @@
 {
-  "name": "spotifylyrics",
+  "name": "spotifygenius",
   "version": "1.0.0",
   "description": "Grabs current song info from Spotify window and gets Genius lyrics",
   "main": "index.js",
