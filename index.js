@@ -20,7 +20,7 @@ let cheerio = require('cheerio');
 var Genius = require("node-genius");
 var geniusClient = new Genius("uG43dODDI_4MMivGiU1wWnW0Xl5hqZxR4ZA_ET0adiTdO0kP8_UMUPuDiBAnJpEo");
 
-var currentSong = {id: null, title: null, artistName: null, artistId: null, url: null};
+var currentSong = {id: null, title: null, artistName: null, artistId: null, lyrics:null, url: null};
 
 
 function createWindow () {
@@ -82,10 +82,10 @@ function search(searchQuery){
 		currentSong.id = song.id;
 		currentSong.artistName = song.primary_artist.name;
 		currentSong.artistId = song.primary_artist.id;
-		currentSong.lyrics = song.url;
+		currentSong.url = song.url;
 
 
-		getLyrics(currentSong.lyrics);
+		getLyrics(currentSong);
 	});
 }
 
@@ -97,13 +97,15 @@ function getSong(id){
 	});
 }
 
-function getLyrics(lyricsUrl){
-	request(lyricsUrl, function (error, response, html) {
+function getLyrics(song){
+  console.log(song);
+  
+	request(song.url, function (error, response, html) {
 		if (!error && response.statusCode == 200) {
 			let $ = cheerio.load(html);
-			var lyrics = $(".lyrics").html();
-			console.log(lyrics);
-			mainWindow.webContents.send('lyrics', lyrics);
+			currentSong.lyrics = $(".lyrics").html();
+
+      mainWindow.webContents.send('lyrics', JSON.stringify(currentSong));
 		}
 	});
 }
