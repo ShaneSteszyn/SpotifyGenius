@@ -18,8 +18,8 @@
       ipcRenderer.on('lyrics', function(event, song){
         song = JSON.parse(song);
         console.log(song);
-        document.getElementById("title").innerHTML = song.title;
-        document.getElementById("artist").innerHTML = song.artistName;
+        document.getElementById("title").innerHTML = song.artistName + " - " +song.title;
+        // document.getElementById("artist").innerHTML = ;
         document.getElementById("lyrics").innerHTML = song.lyrics;
       });
 
@@ -28,31 +28,33 @@
       }
     </script>
     <!-- All of the Node.js APIs are available in this renderer process. -->
-    <div id="electron-titlebar" class="drag" style="background-color: #282828; color:white">
+    <div id="electron-titlebar" class="drag inset" platform="linux" style="background-color: #282828; color:white">
       <div style="width: 100%; height: 100%; text-align: center; line-height: 40px; ">SpotifyGenius</div>
     </div>
 
 
     <div id="topBar">
-      <button onclick="sendReloadSong()" class="ui button">
-        Reload
+      <h3 style="display:inline-block; margin:0px"  align="left" id="title"></h3>
+      <button onclick="sendReloadSong()" class="ui right mini floated button">
+        Reload Song
       </button>
-    </div>
-    <div id="content">
+      <!-- <h2 align="center" id="artist"></h2> -->
       
-      <h2 align="center" id="artist"></h2>
-      <h2 align="center" id="title"></h2>
-      <div id="lyrics">
+    </div>
+    <div>
+      <div id="content">
+        
+        
+        <div id="lyrics">
+        </div>
+
+         Using node <script>document.write(process.versions.node)</script>,
+        Chromium <script>document.write(process.versions.chrome)</script>,
+        and Electron <script>document.write(process.versions.electron)</script>
+        <p>Application built by Shane Steszyn (2016)</p>
+
       </div>
     </div>
-
-    <br>
-
-      Using node <script>document.write(process.versions.node)</script>,
-      Chromium <script>document.write(process.versions.chrome)</script>,
-      and Electron <script>document.write(process.versions.electron)</script>
-      <p>Application built by Shane Steszyn (2016)</p>
-
   </body>
 
   <script>

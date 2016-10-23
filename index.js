@@ -73,7 +73,7 @@ function getSpotifySong(){
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 600, height: 800, frame:false, resizable:true });
+  mainWindow = new BrowserWindow({width: 600, height: 700, frame:false, resizable:true });
 
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/app/index.html`);
