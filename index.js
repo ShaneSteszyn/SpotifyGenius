@@ -26,73 +26,60 @@ var currentSong = {id: null, originalTitle: null, title: null, artistName: null,
 
 
 ipcMain.on('reloadSong', (event, arg) => {
-  getSpotifySong();
-});
-
-ipcMain.on('minimize', (event, arg) => {
-  mainWindow.minimize();
-});
-
-ipcMain.on('maximize', (event, arg) => {
-	if (mainWindow.isMaximized()){
-		mainWindow.unmaximize();
-	}
-	else{
-		mainWindow.maximize();
-	}
+	getSpotifySong();
 });
 
 function getSpotifySong(){
 	spotify.getStatus(function (err, res) {
 
-	  if (err) {
+		if (err) {
 			return console.error(err);
-	  }
+		}
 
-	  if (res.open_graph_state.private_session){
+		if (res.open_graph_state.private_session){
 			return "NOT PUBLIC LISTENING";
 		}  
 
 		console.log(res);
 		if(currentSong.originalTitle !== res.track.track_resource.name){
-	  	//Log info of song currently playing
+			//Log info of song currently playing
 
-		  console.info('currently playing:',
+			console.info('currently playing:',
 			res.track.artist_resource.name, '-',
 			res.track.track_resource.name);
 
-		  currentSong.originalTitle = res.track.track_resource.name;
-		  var query = res.track.artist_resource.name+'-'+res.track.track_resource.name;
+			currentSong.originalTitle = res.track.track_resource.name;
+			var query = res.track.artist_resource.name+'-'+res.track.track_resource.name;
 
-		  search(query);
+			search(query);
 
-		  console.log(query);
+			console.log(query);
 		}
 	});
 }
 
 function createWindow () {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({width: 600, height: 700, frame:false, resizable:true });
+	// Create the browser window.
+	mainWindow = new BrowserWindow({width: 600, height: 700, frame:false, resizable:true });
 
-  // and load the index.html of the app.
-  mainWindow.loadURL(`file://${__dirname}/app/index.html`);
+	// and load the index.html of the app.
+	mainWindow.loadURL(`file://${__dirname}/app/index.html`);
 
-  // Open the DevTools for debugging.
-  mainWindow.webContents.openDevTools();
+	// Open the DevTools for debugging.
+	// mainWindow.webContents.openDevTools();
 
-  // get the name of the song which is currently playing
-  mainWindow.on('focus', getSpotifySong);
+	// get the name of the song which is currently playing
+	mainWindow.on('focus', getSpotifySong);
 	
 
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null;
-  });
+	// Emitted when the window is closed.
+	mainWindow.on('closed', function () {
+		// Dereference the window object, usually you would store windows
+		// in an array if your app supports multi windows, this is the time
+		// when you should delete the corresponding element.
+		mainWindow = null;
+	});
 }
 
 function search(searchQuery){
@@ -139,8 +126,8 @@ function getSong(id){
 }
 
 function getLyrics(song){
-  console.log(song);
-  
+	console.log(song);
+	
 	request(song.url, function (error, response, html) {
 		if (!error && response.statusCode == 200) {
 			let $ = cheerio.load(html);
@@ -157,7 +144,7 @@ function getLyrics(song){
 
 			currentSong.lyrics = $.html();
 
-      mainWindow.webContents.send('lyrics', JSON.stringify(currentSong));
+			mainWindow.webContents.send('lyrics', JSON.stringify(currentSong));
 		}
 	});
 }
@@ -169,17 +156,17 @@ app.on('ready', createWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+	// On OS X it is common for applications and their menu bar
+	// to stay active until the user quits explicitly with Cmd + Q
+	if (process.platform !== 'darwin') {
+		app.quit();
+	}
 });
 
 app.on('activate', function () {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
-    createWindow();
-  }
+	// On OS X it's common to re-create a window in the app when the
+	// dock icon is clicked and there are no other windows open.
+	if (mainWindow === null) {
+		createWindow();
+	}
 });

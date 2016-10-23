@@ -1,3 +1,11 @@
+html, body{
+    margin: 0;
+    padding: 0;
+    min-width: 100%;
+    width: 100%;
+    max-width: 100%;
+}
+
 body {
 	background-color: #181818;
 	color: white;
@@ -16,8 +24,9 @@ body {
 }
 
 #content {
-  max-height: 85vh;
-  overflow: scroll;
+
+  max-height: 87vh;
+  overflow-y: scroll;
 }
 
 /*#topBar {
